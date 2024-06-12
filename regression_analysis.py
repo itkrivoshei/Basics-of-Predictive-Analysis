@@ -1,33 +1,35 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import pandas as pd  # Importing pandas for data manipulation
+import numpy as np  # Importing numpy for numerical operations
+import matplotlib.pyplot as plt  # Importing matplotlib for data visualization
+from sklearn.model_selection import train_test_split  # Importing train_test_split for splitting the dataset
+from sklearn.preprocessing import StandardScaler, OneHotEncoder  # Importing StandardScaler and OneHotEncoder for data preprocessing
+from sklearn.compose import ColumnTransformer  # Importing ColumnTransformer to manage preprocessing pipelines
+from sklearn.pipeline import Pipeline  # Importing Pipeline to streamline preprocessing and model training
+from sklearn.linear_model import LinearRegression  # Importing LinearRegression for regression analysis
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score  # Importing metrics to evaluate model performance
 
 
 def run_regression_analysis():
     # Step 1: Create a synthetic dataset for Berlin apartment rental prices
-    np.random.seed(42)  # For reproducibility
+    np.random.seed(42)  # Setting the seed for reproducibility
 
-    # Number of samples
+    # Number of samples in the dataset
     n_samples = 1000
 
-    # Features
+    # Generate synthetic features
     location = np.random.choice(
         ['Mitte', 'Friedrichshain', 'Kreuzberg', 'Neukölln', 'Charlottenburg'],
-        n_samples)
-    size_sqm = np.random.uniform(20, 150, n_samples)  # Size in square meters
-    num_rooms = np.random.randint(1, 6, n_samples)  # Number of rooms
+        n_samples)  # Randomly assign a location from the given options
+    size_sqm = np.random.uniform(
+        20, 150, n_samples)  # Generate random sizes in square meters
+    num_rooms = np.random.randint(1, 6,
+                                  n_samples)  # Generate random number of rooms
     distance_to_transport = np.random.uniform(
-        0.1, 5, n_samples)  # Distance to nearest public transport in km
+        0.1, 5, n_samples)  # Generate random distances to transport in km
     age_of_building = np.random.randint(
-        1, 100, n_samples)  # Age of the building in years
+        1, 100, n_samples)  # Generate random ages of the building in years
 
-    # Create a DataFrame
+    # Create a DataFrame to hold the features
     df = pd.DataFrame({
         'location': location,
         'size_sqm': size_sqm,
@@ -36,42 +38,47 @@ def run_regression_analysis():
         'age_of_building': age_of_building
     })
 
-    # Target variable: rental price in Euros (a synthetic formula for demonstration)
+    # Generate the target variable (rental price) using a synthetic formula
     df['rental_price'] = (
         10 * df['size_sqm'] + 100 * df['num_rooms'] +
         -50 * df['distance_to_transport'] + -2 * df['age_of_building'] +
-        np.random.normal(0, 50, n_samples)  # Adding some noise
+        np.random.normal(0, 50, n_samples)  # Add some random noise
     )
 
-    # Display the first few rows of the synthetic dataset
+    # Display the first few rows of the synthetic dataset for verification
     print("First few rows of the synthetic dataset:")
     print(df.head())
 
     # Step 2: Handle missing values (no missing values in synthetic data)
 
     # Step 3: Encode categorical variables
-    # Using OneHotEncoder for the 'location' categorical variable
+    # Using OneHotEncoder to transform the 'location' categorical variable into binary columns
     categorical_features = ['location']
     numerical_features = df.drop(
-        columns=['location', 'rental_price']).columns.tolist()
+        columns=['location', 'rental_price'
+                 ]).columns.tolist()  # Identify numerical features
 
     # Step 4: Split the dataset into features (X) and target (y), then into training and testing sets
-    X = df.drop('rental_price', axis=1)  # Features
-    y = df['rental_price']  # Target variable
+    X = df.drop('rental_price',
+                axis=1)  # Separate features from target variable
+    y = df['rental_price']  # Define target variable
 
-    # Use train_test_split to split the data into training and testing sets
+    # Use train_test_split to create training and testing sets
     X_train, X_test, y_train, y_test = train_test_split(X,
                                                         y,
                                                         test_size=0.2,
                                                         random_state=42)
 
     # Step 5: Create a pipeline to preprocess the data and train the Linear Regression model
-    # ColumnTransformer is used to encode categorical features and scale numerical features
-    preprocessor = ColumnTransformer(transformers=[(
-        'cat', OneHotEncoder(),
-        categorical_features), ('num', StandardScaler(), numerical_features)])
+    # ColumnTransformer to apply different transformers to categorical and numerical features
+    preprocessor = ColumnTransformer(transformers=[
+        ('cat', OneHotEncoder(),
+         categorical_features),  # One-hot encode categorical features
+        ('num', StandardScaler(),
+         numerical_features)  # Standardize numerical features
+    ])
 
-    # Pipeline to combine the preprocessing step with the Linear Regression model
+    # Create a pipeline that includes preprocessing and regression model training
     pipeline = Pipeline(steps=[('preprocessor',
                                 preprocessor), ('regressor',
                                                 LinearRegression())])
@@ -80,7 +87,7 @@ def run_regression_analysis():
     pipeline.fit(X_train, y_train)
 
     # Step 6: Predict the target values for the testing set and evaluate the model's performance
-    y_pred = pipeline.predict(X_test)
+    y_pred = pipeline.predict(X_test)  # Generate predictions on the test set
 
     # Calculate evaluation metrics to understand the model's performance
     mae = mean_absolute_error(y_test, y_pred)
@@ -95,10 +102,10 @@ def run_regression_analysis():
     print(f"Root Mean Squared Error (RMSE): {rmse}")
     print(f"R-squared (R2): {r2}")
 
-    # Step 7: Visualizations
+    # Step 7: Visualizations to assess model performance
     fig, axs = plt.subplots(3, 1, figsize=(10, 18))
 
-    # Plotting the distribution of the target variable
+    # Plotting the distribution of the target variable (rental prices)
     axs[0].hist(df['rental_price'], bins=30, edgecolor='k', alpha=0.7)
     axs[0].set_title('Distribution of the Target Variable (rental_price)')
     axs[0].set_xlabel('Rental Price in Euros')
@@ -117,7 +124,7 @@ def run_regression_analysis():
     axs[1].set_ylabel('Predicted Values')
     axs[1].grid(True)
 
-    # Residuals plot
+    # Residuals plot to diagnose model performance
     residuals = y_test - y_pred
     axs[2].scatter(y_pred, residuals, alpha=0.7, color='r')
     axs[2].hlines(y=0,
@@ -136,5 +143,6 @@ def run_regression_analysis():
     plt.show()
 
 
+# Run the regression analysis function if this script is executed directly
 if __name__ == "__main__":
     run_regression_analysis()

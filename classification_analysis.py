@@ -1,12 +1,12 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+import pandas as pd  # Library for data manipulation and analysis
+import numpy as np  # Library for numerical operations
+import matplotlib.pyplot as plt  # Library for plotting
+from sklearn.model_selection import train_test_split  # Function to split data into training and testing sets
+from sklearn.preprocessing import StandardScaler, OneHotEncoder  # Classes for data preprocessing
+from sklearn.compose import ColumnTransformer  # Class to apply transformers to columns
+from sklearn.pipeline import Pipeline  # Class to create a machine learning pipeline
+from sklearn.linear_model import LogisticRegression  # Logistic regression model
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report  # Metrics to evaluate the model
 
 
 def run_classification_analysis():
@@ -88,9 +88,10 @@ def run_classification_analysis():
     y_pred = pipeline.predict(X_test)
 
     # Calculate evaluation metrics to understand the model's performance
-    accuracy = accuracy_score(y_test, y_pred)
-    cm = confusion_matrix(y_test, y_pred)
-    cr = classification_report(y_test, y_pred)
+    accuracy = accuracy_score(y_test, y_pred)  # Calculate accuracy
+    cm = confusion_matrix(y_test, y_pred)  # Generate confusion matrix
+    cr = classification_report(y_test,
+                               y_pred)  # Generate classification report
 
     # Print the evaluation metrics
     print("Model Performance:")
@@ -101,7 +102,7 @@ def run_classification_analysis():
     print(cr)
 
     # Step 7: Visualizations
-    fig, axs = plt.subplots(2, 1, figsize=(10, 12))
+    fig, axs = plt.subplots(2, 1, figsize=(10, 12))  # Create subplots
 
     # Plotting the distribution of the target variable
     axs[0].hist(df['luxury'], bins=3, edgecolor='k', alpha=0.7)
@@ -127,5 +128,6 @@ def run_classification_analysis():
     plt.show()
 
 
+# Run the classification analysis if the script is executed directly
 if __name__ == "__main__":
     run_classification_analysis()
